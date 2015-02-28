@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ '!' -f Makefile ];
+then
+	echo "include $ARDUINO_MAKEFILE" > Makefile
+	make build-cli/depends.mk &>/dev/null
+fi
+
+(make && make upload) 2>&1 | grep -v 'build-cli/depends.mk' | sed 's/^build-cli\/'"$ARDUINO_PROJ_NAME"'\.cpp/'"$ARDUINO_PROJ_FILE/"

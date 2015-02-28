@@ -1,0 +1,5 @@
+_vimduino() {
+	COMPREPLY=( $(compgen -W "$(ls "$(grep '^sketchbook\.path=' ~/.arduino/preferences.txt | sed 's/^sketchbook\.path=//')")" -- "${COMP_WORDS[COMP_CWORD]}") )
+}
+
+complete -F _vimduino vimduino

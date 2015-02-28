@@ -1,0 +1,87 @@
+#!/bin/bash
+
+function getArdPref() {
+	grep '^'"$1"'=' "$ARDUINO_PREFS" | sed 's/^'"$1"'=//'
+}
+
+prefix=@prefix@
+
+if [ -z "$VIMDUINO_PATH" ];
+then
+	VIMDUINO_PATH=@datarootdir@/vimduino
+fi
+
+export VIMDUINO_PATH
+
+ARDUINO_PREFS=~/.arduino/preferences.txt
+export ARDUINO_DIR=/usr/share/arduino/
+export ARDUINO_MAKEFILE="$ARDUINO_DIR/Arduino.mk"
+ARDUINO_SKETCHDIR="`getArdPref 'sketchbook\.path'`"
+export ARDUINO_PORT="`getArdPref 'serial\.port'`"
+export ARD_TAG="`getArdPref 'board'`"
+VIMDUINO_USER_CONF=~/.vimduino/conf
+ARDUINO_DEFAULT_EXT=ino
+
+if [ -f "$VIMDUINO_USER_CONF" ];
+then
+	. "$VIMDUINO_USER_CONF"
+fi
+
+if [ $# -eq 0 ];
+then
+	echo "Usage: vimduino sketch"
+	exit
+fi
+
+if [ '!' -c "$ARDUINO_PORT" ];
+then
+	SERPORTS="`mktemp /dev/shm/serports.XXXXXX`"
+	find /dev -maxdepth 1 -regextype posix-egrep -regex '/dev/ttyUSB.*|/dev/ttyACM.*' -type c -print > "$SERPORTS"
+	SERPORT_COUNT=`wc -l < "$SERPORTS"`
+	if [ $SERPORT_COUNT -eq 1 ];
+	then
+		ARDUINO_PORT="`cat "$SERPORTS"`"
+	elif [ $SERPORT_COUNT -eq 0 ];
+	then
+		echo "Arduino serial port not found, enter it's path or leave it blank, if you don't need it yet."
+		read ARDUINO_PORT
+	else
+		echo "These serial ports were found:"
+		grep -n '' "$SERPORTS"
+		echo "Choose port by number"
+		read PORTNUMBER
+		sed -n $PORTNUMBER'p' "$SERPORTS"
+	fi
+	rm "$SERPORTS"
+fi
+
+export ARDUINO_PROJ_FILE
+
+export ARDUINO_PROJ_NAME="$1"
+
+if [ -d "$ARDUINO_SKETCHDIR/$1" ];
+then
+	cd "$ARDUINO_SKETCHDIR/$1"
+	if [ -f .vimduino ];
+	then
+		. .vimduino
+	fi
+
+	if [ -f "$1.ino" ];
+	then
+		ARDUINO_PROJ_FILE="$1.ino"
+	elif [ -f "$1.pde" ];
+	then
+		ARDUINO_PROJ_FILE="$1.pde"
+	else
+		echo "Error: project file not found"
+		exit 1
+	fi
+	vim -S "$VIMDUINO_PATH/vimrc" "+set makeprg=$VIMDUINO_PATH/vimduinomake" "$ARDUINO_PROJ_FILE"
+else
+	mkdir -p "$ARDUINO_SKETCHDIR/$1"
+	cd "$ARDUINO_SKETCHDIR/$1"
+	ARDUINO_PROJ_FILE="$1.$ARDUINO_DEFAULT_EXT"
+	vim -S "$VIMDUINO_PATH/vimrc" "+r $VIMDUINO_PATH/template.cpp" "+set makeprg=$VIMDUINO_PATH/vimduinomake" "$ARDUINO_PROJ_FILE"
+fi
+
