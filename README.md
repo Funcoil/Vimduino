@@ -28,6 +28,8 @@ Usage
 
 Run `vimduino SKETCH`. If `SKETCH` doesn't exist, it's created. You can then hit `<C-U>` to upload the code and `<C-D>` to view data from serial port (end with `<C-C>`)
 
+To change target board press `<C-B>`
+
 Disclaimer
 ----------
 
