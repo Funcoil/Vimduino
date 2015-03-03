@@ -17,14 +17,14 @@ infiniteread: infiniteread.c
 
 install:
 	install -D -m 755 vimduino $(DESTDIR)$(bindir)/vimduino
-	install -D -m 755 vimduinomake $(DESTDIR)$(bindir)/vimduinomake
+	install -D -m 755 vimduinomake $(DESTDIR)$(datadir)/vimduinomake
 	install -D -m 755 infiniteread $(DESTDIR)$(bindir)/infiniteread
 	install -D -m 644 vimrc $(DESTDIR)$(datadir)/vimrc
 	install -D -m 644 template.cpp $(DESTDIR)$(datadir)/template.cpp
 	install -D -m 644 bash_completion $(DESTDIR)/etc/bash_completion.d/vimduino
 
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/vimduino $(DESTDIR)$(bindir)/vimduinomake $(DESTDIR)$(bindir)/infiniteread $(DESTDIR)$(datadir)/vimrc $(DESTDIR)$(datadir)/template.cpp $(DESTDIR)/etc/bash_completion.d/vimduino
+	rm -f $(DESTDIR)$(bindir)/vimduino $(DESTDIR)$(datadir)/vimduinomake $(DESTDIR)$(bindir)/infiniteread $(DESTDIR)$(datadir)/vimrc $(DESTDIR)$(datadir)/template.cpp $(DESTDIR)/etc/bash_completion.d/vimduino
 	rmdir --ignore-fail-on-non-empty -p $(DESTDIR)$(bindir) $(DESTDIR)$(datadir) $(DESTDIR)/etc/bash_completion.d/
 
 .PHONY: all clean distclean install uninstall

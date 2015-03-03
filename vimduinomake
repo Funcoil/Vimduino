@@ -1,5 +1,9 @@
 #!/bin/bash
 
+export PATH=$PATH:$ARDUINO_DIR
+
+echo "Compiling for $ARD_TAG" >&2
+
 if [ '!' -f Makefile ];
 then
 	echo "include $ARDUINO_MAKEFILE" > Makefile
